@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data-sources>
+	<data-source id="csvjdbc-1710cc5dcc1-11974222aa547f50" provider="generic" driver="csvjdbc" name="Flat files - data" save-password="true" read-only="false">
+		<connection server="" database="C:\data" url="jdbc:relique:csv:C:\data" type="dev"/>
+	</data-source>
+	<data-source id="apache_ignite-1710d223226-24eed520dda557e4" provider="generic" driver="apache_ignite" name="Apache Ignite - TITANIC" save-password="true" read-only="false">
+		<connection host="localhost" port="10838" server="" database="TITANIC" url="jdbc:ignite:thin://localhost:10838/TITANIC" type="dev"/>
+	</data-source>
+	<filters/>
+</data-sources>

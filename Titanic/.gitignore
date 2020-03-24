@@ -1,0 +1,10 @@
+# eclipse project file
+.settings/
+.classpath
+.project
+
+# Maven
+target/
+
+# GridGain Cluster secret properties
+secret.properties

@@ -1,0 +1,2 @@
+SELECT passengerid
+  FROM TITANIC
