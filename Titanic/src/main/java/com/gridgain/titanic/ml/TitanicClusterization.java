@@ -73,65 +73,73 @@ public class TitanicClusterization {
 
             IgniteCache<Titanic, TitanicKey> dataCache = null;
             try {
+            	/*
+            	 * 1. Access Data
+            	 * 
+            	 *    - SqlDatasetBuilder prepares a class to pull data from a SQL-based cache
+            	 *    
+            	 *    NOTE: this dataset builder can be done directly during fit() as below
+            	 */
                 //dataCache = ignite.getOrCreateCache(CACHE_NAME).withKeepBinary();
-                dataCache = ignite.getOrCreateCache(CACHE_NAME);
-
-//                SqlDatasetBuilder sqlDS = new SqlDatasetBuilder(ignite, CACHE_NAME);
-//                CacheBasedDatasetBuilder<Integer, BinaryObject> datasetBuilder = new CacheBasedDatasetBuilder<Titanic,TitanicKey>(ignite, dataCache).withKeepBinary(true);
-//                
+                //SqlDatasetBuilder sqlDS = new SqlDatasetBuilder(ignite, CACHE_NAME);
+                //CacheBasedDatasetBuilder<Integer, BinaryObject> datasetBuilder = new CacheBasedDatasetBuilder<Titanic,TitanicKey>(ignite, dataCache).withKeepBinary(true);
+                
+            	/*
+            	 * 2. Preprocess Data
+            	 * 
+            	 *    BinaryObjectVectorizer will:
+            	 *    - use coordinates to select features
+            	 *    - map features from String literals to numeric values
+            	 *    - set the Label of the vector to a particular field 
+            	 *    
+            	 *    NOTE: can be done directly during fit() call as below
+            	 */
 //                //Vectorizer<Integer, Vector, Integer, Double> vectorizer = new DummyVectorizer<Integer>().labeled(Vectorizer.LabelCoordinate.FIRST);
 //                LabeledDummyVectorizer<Integer, Double> vectorizer = new LabeledDummyVectorizer(1);
-//
-//                // Create trainer.
-//                //DecisionTreeClassificationTrainer trainer = new DecisionTreeClassificationTrainer(4, 0);
-//                KMeansTrainer trainer = new KMeansTrainer();
-//
-//                //DecisionTreeNode mdl = trainer.fit(
-//                //KMeansModel mdl = trainer.fit(
-//                KMeansModel mdl = trainer.fit(
-//                    ignite,
-//                    dataCache,
-//                    (Preprocessor)vectorizer
-//                );
+//                // a pre-processor that converts Cache BinaryObjects into a Vector
 
-                System.out.println(">>> Prepare trainer...");
-                KMeansTrainer trainer = new KMeansTrainer();
 
                 /*
-                // a pre-processor that converts Cache BinaryObjects into a Vector
-                Vectorizer bov = new DenseBinaryObjectVectorizer<>("pclass", "age", "sibsp", "parch", "fare")
-	                .withFeature("sex", DenseBinaryObjectVectorizer.Mapping.create().map("male", 1.0).defaultValue(0.0))
-	                .withFeature("embarked", DenseBinaryObjectVectorizer.Mapping.create().map("C", 1.0).defaultValue(0.0))
-	                .withFeature("cabin", DenseBinaryObjectVectorizer.Mapping.create().map("", 0.0).defaultValue(1.0))
-	                .labeled("survived");
+            	 * 3. Fit Data with trainer to create model
+            	 * 
+            	 *    - Create a particular type of Trainer
+            	 *    - Fit the trainer by supplying:
+            	 *        a. the dataset (or an object that create a dataset; in this case the DatasetBuilder
+            	 *        b. a vectorizer - i.e. something that can take the dataset and convert to the selected, filtered, mapped Vector the trainer needs
+            	 */
+                // Create trainer.
+                System.out.println(">>> Prepare trainer...");
+                //DecisionTreeClassificationTrainer trainer = new DecisionTreeClassificationTrainer(4, 0);
+                KMeansTrainer trainer = new KMeansTrainer();
 
+                // With trainer, run fit(), supplying data (a SQL/cache-based Dataset Builder) and preprocessor (here a BinaryObjectVectorizer)
                 KMeansModel mdl = trainer.fit(
-                    //new SqlDatasetBuilder(ignite, CACHE_NAME),
-                    ignite, dataCache, bov
-                );
-                */
-
-                KMeansModel mdl = trainer.fit(
-                        //ignite, CACHE_NAME, 
-                    new SqlDatasetBuilder(ignite, CACHE_NAME),
+                    new SqlDatasetBuilder(ignite, CACHE_NAME),  //ignite, CACHE_NAME, // Alternate fit() signature
                     new DenseBinaryObjectVectorizer<>("pclass", "sex", "age", "sibsp", "parch", "fare", "cabin", "embarked")
 	                .withFeature("sex", DenseBinaryObjectVectorizer.Mapping.create().map("male", 1.0).defaultValue(0.0))
 	                .withFeature("embarked", DenseBinaryObjectVectorizer.Mapping.create().map("C", 1.0).defaultValue(0.0))
 	                .withFeature("cabin", DenseBinaryObjectVectorizer.Mapping.create().map("", 0.0).defaultValue(1.0))
 	                .labeled("survived")
-		            
                 );
 
-
+                // Print out Model metadata
                 System.out.println(">>> KMeans centroids");
                 Tracer.showAscii(mdl.getCenters()[0]);
                 Tracer.showAscii(mdl.getCenters()[1]);
                 System.out.println(">>>");
 
+
+                /*
+            	 * 4. Predict new data from trained model
+            	 * 
+            	 *    Create an ML Vector with a new data point and predict from model   
+            	 */
                 System.out.println(">>> --------------------------------------------");
                 System.out.println(">>> | Predicted cluster\t| Erased class label\t|");
                 System.out.println(">>> --------------------------------------------");
 
+                // now that we trained the model, let's compare against the ground truth results
+                dataCache = ignite.getOrCreateCache(CACHE_NAME);
                 try (QueryCursor<Cache.Entry<TitanicKey, Titanic>> observations = dataCache.query(new ScanQuery<>())) {
                 	int totalEntries = 0;
                 	int totalCorrect = 0;
@@ -164,14 +172,6 @@ public class TitanicClusterization {
                     	
                 	}
                 	System.out.printf(">>> K Means model: %d correct vs %d total entries, or %.2f%% correct.\n", totalCorrect, totalEntries,(100.0*totalCorrect/totalEntries));
-                	
-                    	//Titanic inputs = val.copyOfRange(1, val.size());
-//                        double groundTruth = val.get(0);
-//
-//                        double prediction = mdl.predict(inputs);
-//
-//                        System.out.printf(">>> | %.4f\t\t\t| %.4f\t\t|\n", prediction, groundTruth);
-
                     System.out.println(">>> ---------------------------------");
                     System.out.println(">>> KMeans clustering algorithm over cached dataset usage example completed.");
                 } catch(Exception e) {
