@@ -24,6 +24,7 @@
     <bean class="org.apache.ignite.configuration.IgniteConfiguration">
         <property name="clientMode" value="true"/>
         <property name="igniteInstanceName" value="Titanic"/>
+        <property name="peerClassLoadingEnabled" value="true"/>
 
         <property name="discoverySpi">
             <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
@@ -66,6 +67,12 @@
                     <property name="atomicityMode" value="ATOMIC"/>
                     <property name="copyOnRead" value="true"/>
                     <property name="sqlSchema" value="TITANIC"/>
+
+					<property name="affinity">
+					    <bean class="org.apache.ignite.cache.affinity.rendezvous.RendezvousAffinityFunction">
+					        <property name="partitions" value="256"/>
+					    </bean>
+					</property>
 
                     <property name="cacheStoreFactory">
                         <bean class="org.apache.ignite.cache.store.jdbc.CacheJdbcPojoStoreFactory">

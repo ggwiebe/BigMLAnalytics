@@ -32,6 +32,7 @@ import org.apache.ignite.ml.dataset.feature.extractor.impl.DummyVectorizer;
 import org.apache.ignite.ml.dataset.feature.extractor.impl.LabeledDummyVectorizer;
 import org.apache.ignite.ml.math.Tracer;
 import org.apache.ignite.ml.math.primitives.vector.Vector;
+import org.apache.ignite.ml.math.primitives.vector.impl.DenseVector;
 import org.apache.ignite.ml.preprocessing.Preprocessor;
 import org.apache.ignite.ml.sql.SqlDatasetBuilder;
 import org.apache.ignite.ml.tree.DecisionTreeClassificationTrainer;
@@ -39,7 +40,7 @@ import org.apache.ignite.ml.tree.DecisionTreeNode;
 import org.apache.ignite.ml.util.MLSandboxDatasets;
 import org.apache.ignite.ml.util.SandboxMLCache;
 
-import com.gridgain.titanic.ml.dataset.feature.extractor.impl.BinaryObjectVectorizer;
+import org.apache.ignite.ml.dataset.feature.extractor.impl.DenseBinaryObjectVectorizer;
 import com.gridgain.titanic.model.Titanic;
 import com.gridgain.titanic.model.TitanicKey;
 
@@ -72,6 +73,7 @@ public class TitanicClusterization {
 
             IgniteCache<Titanic, TitanicKey> dataCache = null;
             try {
+                //dataCache = ignite.getOrCreateCache(CACHE_NAME).withKeepBinary();
                 dataCache = ignite.getOrCreateCache(CACHE_NAME);
 
 //                SqlDatasetBuilder sqlDS = new SqlDatasetBuilder(ignite, CACHE_NAME);
@@ -91,20 +93,35 @@ public class TitanicClusterization {
 //                    dataCache,
 //                    (Preprocessor)vectorizer
 //                );
-                
+
                 System.out.println(">>> Prepare trainer...");
                 KMeansTrainer trainer = new KMeansTrainer();
-                //DecisionTreeClassificationTrainer trainer = new DecisionTreeClassificationTrainer(4, 0);
 
-                //DecisionTreeNode mdl = trainer.fit(
+                /*
+                // a pre-processor that converts Cache BinaryObjects into a Vector
+                Vectorizer bov = new DenseBinaryObjectVectorizer<>("pclass", "age", "sibsp", "parch", "fare")
+	                .withFeature("sex", DenseBinaryObjectVectorizer.Mapping.create().map("male", 1.0).defaultValue(0.0))
+	                .withFeature("embarked", DenseBinaryObjectVectorizer.Mapping.create().map("C", 1.0).defaultValue(0.0))
+	                .withFeature("cabin", DenseBinaryObjectVectorizer.Mapping.create().map("", 0.0).defaultValue(1.0))
+	                .labeled("survived");
+
                 KMeansModel mdl = trainer.fit(
-                    new SqlDatasetBuilder(ignite, "TitanicCache"),
-                    new BinaryObjectVectorizer<>("pclass", "age", "sibsp", "parch", "fare")
-	                    .withFeature("sex", BinaryObjectVectorizer.Mapping.create().map("male", 1.0).defaultValue(0.0))
-	                    .withFeature("embarked", BinaryObjectVectorizer.Mapping.create().map("C", 1.0).defaultValue(0.0))
-	                    .withFeature("cabin", BinaryObjectVectorizer.Mapping.create().map("", 0.0).defaultValue(1.0))
-                        .labeled("survived")
+                    //new SqlDatasetBuilder(ignite, CACHE_NAME),
+                    ignite, dataCache, bov
                 );
+                */
+
+                KMeansModel mdl = trainer.fit(
+                        //ignite, CACHE_NAME, 
+                    new SqlDatasetBuilder(ignite, CACHE_NAME),
+                    new DenseBinaryObjectVectorizer<>("pclass", "sex", "age", "sibsp", "parch", "fare", "cabin", "embarked")
+	                .withFeature("sex", DenseBinaryObjectVectorizer.Mapping.create().map("male", 1.0).defaultValue(0.0))
+	                .withFeature("embarked", DenseBinaryObjectVectorizer.Mapping.create().map("C", 1.0).defaultValue(0.0))
+	                .withFeature("cabin", DenseBinaryObjectVectorizer.Mapping.create().map("", 0.0).defaultValue(1.0))
+	                .labeled("survived")
+		            
+                );
+
 
                 System.out.println(">>> KMeans centroids");
                 Tracer.showAscii(mdl.getCenters()[0]);
@@ -116,19 +133,49 @@ public class TitanicClusterization {
                 System.out.println(">>> --------------------------------------------");
 
                 try (QueryCursor<Cache.Entry<TitanicKey, Titanic>> observations = dataCache.query(new ScanQuery<>())) {
-                    for (Cache.Entry<TitanicKey, Titanic> observation : observations) {
+                	int totalEntries = 0;
+                	int totalCorrect = 0;
+                	int totalWrong = 0;
+                	for (Cache.Entry<TitanicKey, Titanic> observation : observations) {
                     	Titanic val = observation.getValue();
-                        //Titanic inputs = val.copyOfRange(1, val.size());
+                    	totalEntries++;
+                    	
+                    	double[] obsVals = new double[8];
+                    	obsVals[0] = val.getPclass();
+                    	obsVals[1] = (val.getSex().equalsIgnoreCase("male")) ? 1.0 : 0.0;
+                    	obsVals[2] = val.getAge();
+                    	obsVals[3] = val.getSibsp();
+                    	obsVals[4] = val.getParch();
+                    	obsVals[5] = val.getFare();
+                    	obsVals[6] = (val.getCabin().equalsIgnoreCase("")) ? 0.0 : (1.0);
+                    	obsVals[7] = (val.getEmbarked().equalsIgnoreCase("C")) ? 1.0 : 0.0;
+                    	int preVal = mdl.predict(new DenseVector(obsVals));
 
+                    	if ( preVal==1 && val.getSurvived()==1) {
+                    		// predict survived and did survive
+                    		totalCorrect++;
+                    	} else if ( preVal==0 && val.getSurvived()==0) {
+                    		// predict !survived and did not survive
+                    		totalCorrect++;
+                    	} else {
+                    		// wrong
+                    		totalWrong++;
+                    	}
+                    	
+                	}
+                	System.out.printf(">>> K Means model: %d correct vs %d total entries, or %.2f%% correct.\n", totalCorrect, totalEntries,(100.0*totalCorrect/totalEntries));
+                	
+                    	//Titanic inputs = val.copyOfRange(1, val.size());
 //                        double groundTruth = val.get(0);
 //
 //                        double prediction = mdl.predict(inputs);
 //
 //                        System.out.printf(">>> | %.4f\t\t\t| %.4f\t\t|\n", prediction, groundTruth);
-                    }
 
                     System.out.println(">>> ---------------------------------");
                     System.out.println(">>> KMeans clustering algorithm over cached dataset usage example completed.");
+                } catch(Exception e) {
+                	System.out.println("Query Cursor: Caught Exception: " + e);
                 }
             } finally {
                 //dataCache.destroy();

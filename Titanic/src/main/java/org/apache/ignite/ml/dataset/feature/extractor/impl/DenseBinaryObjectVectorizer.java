@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.gridgain.titanic.ml.dataset.feature.extractor.impl;
+package org.apache.ignite.ml.dataset.feature.extractor.impl;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,15 +26,15 @@ import org.apache.ignite.internal.binary.GridBinaryMarshaller;
 import org.apache.ignite.ml.dataset.feature.extractor.ExtractionUtils;
 import org.apache.ignite.ml.environment.deploy.DeployableObject;
 import org.apache.ignite.ml.math.primitives.vector.Vector;
-import org.apache.ignite.ml.math.primitives.vector.impl.DenseVector;
-import org.apache.ignite.ml.math.primitives.vector.impl.SparseVector;
+import org.apache.ignite.ml.math.primitives.vector.impl.VerboseDenseVector;
+//import org.apache.ignite.ml.math.primitives.vector.impl.SparseVector;
 
 /**
  * Vectorizer on binary objects.
  *
  * @param <K> Type of key.
  */
-public final class BinaryObjectVectorizer<K> extends ExtractionUtils.StringCoordVectorizer<K, BinaryObject>
+public final class DenseBinaryObjectVectorizer<K> extends ExtractionUtils.StringCoordVectorizer<K, BinaryObject>
     implements DeployableObject {
     /** Serial version uid. */
     private static final long serialVersionUID = 2152161240934492838L;
@@ -49,7 +49,7 @@ public final class BinaryObjectVectorizer<K> extends ExtractionUtils.StringCoord
      *
      * @param coords Coordinates.
      */
-    public BinaryObjectVectorizer(String... coords) {
+    public DenseBinaryObjectVectorizer(String... coords) {
         super(coords);
     }
 
@@ -60,7 +60,7 @@ public final class BinaryObjectVectorizer<K> extends ExtractionUtils.StringCoord
      * @param valuesMapping Mapping.
      * @return this.
      */
-    public BinaryObjectVectorizer withFeature(String coord, Mapping valuesMapping) {
+    public DenseBinaryObjectVectorizer withFeature(String coord, Mapping valuesMapping) {
         featureValueMappings.put(coord, valuesMapping.toMap());
         return this;
     }
@@ -93,7 +93,7 @@ public final class BinaryObjectVectorizer<K> extends ExtractionUtils.StringCoord
 
     /** {@inheritDoc} */
     @Override protected Vector createVector(int size) {
-        return new DenseVector(size);
+        return new VerboseDenseVector(size);
     }
 
     /** Feature values mapping for non-number features. */
