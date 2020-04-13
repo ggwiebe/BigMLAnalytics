@@ -170,8 +170,8 @@ public class TitanicClusterization {
                     		totalWrong++;
                     	}
                     	
-                	}
-                	System.out.printf(">>> K Means model: %d correct vs %d total entries, or %.2f%% correct.\n", totalCorrect, totalEntries,(100.0*totalCorrect/totalEntries));
+                    }
+                    System.out.printf(">>> K Means model: %d correct vs %d total entries, or %.2f%% correct.\n", totalCorrect, totalEntries,(100.0*totalCorrect/totalEntries));
                     System.out.println(">>> ---------------------------------");
                     System.out.println(">>> KMeans clustering algorithm over cached dataset usage example completed.");
                 } catch(Exception e) {
