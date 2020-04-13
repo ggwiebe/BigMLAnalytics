@@ -6,5 +6,8 @@
 # Maven
 target/
 
+# Binary / Jar files
+jdbc-drivers
+
 # GridGain Cluster secret properties
 secret.properties
