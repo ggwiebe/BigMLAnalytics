@@ -1,6 +1,7 @@
 package com.gridgain.titanic.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * Titanic definition.
@@ -47,9 +48,13 @@ public class Titanic implements Serializable {
     /** Value for embarked. */
     private String embarked;
 
+    /** Internal value to track changes. */
+    private Timestamp updateTS;
+
     /** Empty constructor. **/
     public Titanic() {
-        // No-op.
+        updateTS = new Timestamp(System.currentTimeMillis());
+        System.out.println("New Titanic record created with empty constructor, at " + this.updateTS);
     }
 
     /** Full constructor. **/
@@ -77,6 +82,8 @@ public class Titanic implements Serializable {
         this.fare = fare;
         this.cabin = cabin;
         this.embarked = embarked;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
+        System.out.println("New Titanic record created with full constructor, at " + this.updateTS);
     }
 
     /**
@@ -95,6 +102,7 @@ public class Titanic implements Serializable {
      **/
     public void setSurvived(Integer survived) {
         this.survived = survived;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -113,6 +121,7 @@ public class Titanic implements Serializable {
      **/
     public void setPclass(Integer pclass) {
         this.pclass = pclass;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -131,6 +140,7 @@ public class Titanic implements Serializable {
      **/
     public void setName(String name) {
         this.name = name;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -149,6 +159,7 @@ public class Titanic implements Serializable {
      **/
     public void setSex(String sex) {
         this.sex = sex;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -167,6 +178,7 @@ public class Titanic implements Serializable {
      **/
     public void setAge(Double age) {
         this.age = age;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -185,6 +197,7 @@ public class Titanic implements Serializable {
      **/
     public void setSibsp(Integer sibsp) {
         this.sibsp = sibsp;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -203,6 +216,7 @@ public class Titanic implements Serializable {
      **/
     public void setParch(Integer parch) {
         this.parch = parch;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -221,6 +235,7 @@ public class Titanic implements Serializable {
      **/
     public void setTicket(String ticket) {
         this.ticket = ticket;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -239,6 +254,7 @@ public class Titanic implements Serializable {
      **/
     public void setFare(Double fare) {
         this.fare = fare;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -257,6 +273,7 @@ public class Titanic implements Serializable {
      **/
     public void setCabin(String cabin) {
         this.cabin = cabin;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /**
@@ -275,6 +292,7 @@ public class Titanic implements Serializable {
      **/
     public void setEmbarked(String embarked) {
         this.embarked = embarked;
+        this.updateTS = new Timestamp(System.currentTimeMillis());
     }
 
     /** {@inheritDoc} **/
@@ -334,6 +352,9 @@ public class Titanic implements Serializable {
         if (embarked != null ? !embarked.equals(that.embarked) : that.embarked != null)
             return false;
         
+        if (updateTS != null ? !updateTS.equals(that.updateTS) : that.updateTS != null)
+            return false;
+        
         return true;
     }
 
@@ -363,6 +384,8 @@ public class Titanic implements Serializable {
 
         res = 31 * res + (embarked != null ? embarked.hashCode() : 0);
 
+        res = 31 * res + (updateTS != null ? updateTS.hashCode() : 0);
+
         return res;
     }
 
@@ -380,7 +403,8 @@ public class Titanic implements Serializable {
             "ticket=" + ticket + ", " + 
             "fare=" + fare + ", " + 
             "cabin=" + cabin + ", " + 
-            "embarked=" + embarked +
+            "embarked=" + embarked + ", " + 
+            "updateTS=" + updateTS +
         "]";
     }
 }

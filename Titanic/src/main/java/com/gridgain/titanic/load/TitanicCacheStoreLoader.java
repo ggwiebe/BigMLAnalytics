@@ -46,6 +46,8 @@ import com.gridgain.titanic.util.ParseTypes;
  * Load data from CSV file using {@link CacheLoadOnlyStoreAdapter}.
  *
  * The adapter is intended to be used in cases when you need to pre-load a cache from text or file of any other format.
+ * 
+ * NOT WORKING AT PRESENT!!!
  */
 public class TitanicCacheStoreLoader {
 
@@ -63,17 +65,17 @@ public class TitanicCacheStoreLoader {
         System.out.println(">>> TitanicCacheStoreLoader started...");
 
         System.out.println(">>> TitanicCacheStoreLoader create a TitanicLoadOnlyStore and initialize with file to load: " + args[0] + "...");
-    	TitanicLoadOnlyStore sfl = new TitanicLoadOnlyStore();
-        sfl.setThreadsCount(2);
-        sfl.setBatchSize(100);
-        sfl.setBatchQueueSize(10);
+    	TitanicLoadOnlyStore<TitanicKey, Titanic> los = new TitanicLoadOnlyStore();
+        los.setThreadsCount(2);
+        los.setBatchSize(100);
+        los.setBatchQueueSize(10);
     	
         System.out.println(">>> TitanicCacheStoreLoader start Ignite client and do...");
-        try (Ignite ignite = Ignition.start("VRTX-client.xml")) {
+        try (Ignite ignite = Ignition.start("Titanic-client.xml")) {
 
             // if we are able to create the cache, then load it
-            System.out.println(">>> TitanicCacheStoreLoader get or cretae cache...");
-            try (IgniteCache<TitanicKey, Titanic> cache = ignite.getOrCreateCache(cacheConfiguration(sfl))) {
+            System.out.println(">>> TitanicCacheStoreLoader get or create cache...");
+            try (IgniteCache<TitanicKey, Titanic> cache = ignite.getOrCreateCache(cacheConfiguration(los))) {
 
             	// have Cache's CacheStore load the data...
                 System.out.println(">>> TitanicCacheStoreLoader; with cache, load using CacheStore...");

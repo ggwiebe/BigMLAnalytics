@@ -77,6 +77,7 @@
                     <property name="cacheStoreFactory">
                         <bean class="org.apache.ignite.cache.store.jdbc.CacheJdbcPojoStoreFactory">
                         <!-- <bean class="org.apache.ignite.cache.store.CacheLoadOnlyStoreAdapter"> -->
+                        <!-- <bean class="com.gridgain.titanic.load.TitanicLoadOnlyStore"> -->
                             <property name="dataSourceBean" value="dsGeneric_titanic"/>
                             <property name="dialect">
                                 <bean class="org.apache.ignite.cache.store.jdbc.dialect.BasicJdbcDialect">
@@ -243,6 +244,7 @@
                                         <entry key="fare" value="java.lang.Double"/>
                                         <entry key="cabin" value="java.lang.String"/>
                                         <entry key="embarked" value="java.lang.String"/>
+                                        <entry key="updateTS" value="java.lang.Timestamp"/>
                                     </map>
                                 </property>
 

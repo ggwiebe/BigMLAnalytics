@@ -2,6 +2,7 @@ package com.gridgain.titanic.config;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,7 +183,8 @@ public class ServerConfigurationFactory {
             new JdbcTypeField(Types.VARCHAR, "Ticket", String.class, "ticket"),
             new JdbcTypeField(Types.VARCHAR, "Fare", String.class, "fare"),
             new JdbcTypeField(Types.VARCHAR, "Cabin", String.class, "cabin"),
-            new JdbcTypeField(Types.VARCHAR, "Embarked", String.class, "embarked")
+            new JdbcTypeField(Types.VARCHAR, "Embarked", String.class, "embarked"),
+            new JdbcTypeField(Types.VARCHAR, "UpdateTS", Timestamp.class, "updateTS")
         );
 
         return type;

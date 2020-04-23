@@ -27,18 +27,18 @@ import com.gridgain.titanic.util.ParseTypes;
  */
 public class TitanicLoadOnlyStore<K, V> extends CacheLoadOnlyStoreAdapter<TitanicKey, Titanic, String> implements Serializable {
 
-	///** Csv file name. */
-    //String csvFileName;
-
-    ///** Constructor. */
-    //public TitanicLoadOnlyStore(String csvFileName) {
-    //    this.csvFileName = csvFileName;
-    //    System.out.println(">>> TitanicLoadOnlyStore (LoadOnly type) constructed with csvFileName=" + this.csvFileName);
-    //}
+	/** Csv file name. */
+    private String csvFileName;
 
     /** Empty Constructor. */
     public TitanicLoadOnlyStore() {
         System.out.println(">>> TitanicLoadOnlyStore (LoadOnly type) constructed");
+    }
+
+    /** Constructor with csv file parm. */
+    public TitanicLoadOnlyStore(String fn) {
+        System.out.println(">>> TitanicLoadOnlyStore (LoadOnly type) constructed with file to be loaded: " + fn);
+        csvFileName = fn;
     }
 
     /** {@inheritDoc} */
