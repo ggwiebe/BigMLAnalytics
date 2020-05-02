@@ -10,7 +10,6 @@
     <version>0.0.2</version>
 
     <properties>
-        <gridgain.version>8.7.14</gridgain.version>
         <ignite.version>2.8.0</ignite.version>
         <java.version>1.8</java.version>
     </properties>
@@ -24,34 +23,29 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.gridgain</groupId>
-            <artifactId>gridgain-core</artifactId>
-            <version>${gridgain.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gridgain</groupId>
+            <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-core</artifactId>
-            <version>${gridgain.version}</version>
+            <version>${ignite.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.gridgain</groupId>
+            <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-spring</artifactId>
-            <version>${gridgain.version}</version>
+            <version>${ignite.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.gridgain</groupId>
+            <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-indexing</artifactId>
-            <version>${gridgain.version}</version>
+            <version>${ignite.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.gridgain</groupId>
-            <artifactId>ignite-ml</artifactId>
-            <version>${gridgain.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gridgain</groupId>
+            <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-rest-http</artifactId>
-            <version>${gridgain.version}</version>
+            <version>${ignite.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ignite</groupId>
+            <artifactId>ignite-cloud</artifactId>
+            <version>${ignite.version}</version>
         </dependency>
         <dependency>
             <groupId>com.mchange</groupId>
@@ -62,6 +56,22 @@
             <groupId>com.mchange</groupId>
             <artifactId>mchange-commons-java</artifactId>
             <version>0.2.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ignite</groupId>
+            <artifactId>ignite-ml</artifactId>
+            <version>${ignite.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ignite</groupId>
+            <artifactId>ignite-examples</artifactId>
+            <version>2.8.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.5</version>
         </dependency>
     </dependencies>
 
@@ -88,7 +98,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <excludeGroupIds>org.gridgain,org.gridgain</excludeGroupIds>
+                            <excludeGroupIds>org.apache.ignite,org.gridgain</excludeGroupIds>
                             <outputDirectory>target/libs</outputDirectory>
                             <includeScope>compile</includeScope>
                             <excludeTransitive>true</excludeTransitive>
@@ -100,8 +110,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>

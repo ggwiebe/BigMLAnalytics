@@ -74,10 +74,15 @@
 					    </bean>
 					</property>
 
-                    <property name="cacheStoreFactory">
-                        <bean class="org.apache.ignite.cache.store.jdbc.CacheJdbcPojoStoreFactory">
+			        <property name="cacheStoreFactory">
+			          <bean class="javax.cache.configuration.FactoryBuilder" factory-method="factoryOf">
+			            <constructor-arg value="com.gridgain.titanic.load.TitanicCacheLoadOnlyStore"/>
+			          </bean>
+			        </property>
+
+                    <!-- <property name="cacheStoreFactory"> -->
                         <!-- <bean class="org.apache.ignite.cache.store.CacheLoadOnlyStoreAdapter"> -->
-                        <!-- <bean class="com.gridgain.titanic.load.TitanicLoadOnlyStore"> -->
+                        <!-- <bean class="org.apache.ignite.cache.store.jdbc.CacheJdbcPojoStoreFactory">
                             <property name="dataSourceBean" value="dsGeneric_titanic"/>
                             <property name="dialect">
                                 <bean class="org.apache.ignite.cache.store.jdbc.dialect.BasicJdbcDialect">
@@ -90,7 +95,7 @@
                                         <property name="cacheName" value="TitanicCache"/>
                                         <property name="keyType" value="com.gridgain.titanic.model.TitanicKey"/>
                                         <property name="valueType" value="com.gridgain.titanic.model.Titanic"/>
-                                        <!-- <property name="databaseSchema" value="TITANIC"/> -->
+                                        <! - - <property name="databaseSchema" value="TITANIC"/> - - >
                                         <property name="databaseTable" value="titanic"/>
 
                                         <property name="keyFields">
@@ -211,8 +216,8 @@
                                     </bean>
                                 </list>
                             </property>
-                        </bean>
-                    </property>
+                        </bean> -->
+                    <!-- </property> -->
 
                     <property name="readThrough" value="false"/>
                     <property name="eagerTtl" value="true"/>

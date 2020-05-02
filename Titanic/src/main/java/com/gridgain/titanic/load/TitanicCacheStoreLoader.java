@@ -16,43 +16,33 @@
 
 package com.gridgain.titanic.load;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 import javax.cache.configuration.FactoryBuilder;
-import javax.cache.integration.CacheLoaderException;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteException;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.cache.CachePeekMode;
-import org.apache.ignite.cache.store.CacheLoadOnlyStoreAdapter;
+//import org.apache.ignite.cache.store.CacheLoadOnlyStoreAdapter;
 import org.apache.ignite.configuration.CacheConfiguration;
-import org.apache.ignite.internal.util.IgniteUtils;
-import org.apache.ignite.internal.util.typedef.T2;
-import org.apache.ignite.lang.IgniteBiTuple;
-import org.jetbrains.annotations.Nullable;
 
 import com.gridgain.titanic.model.Titanic;
 import com.gridgain.titanic.model.TitanicKey;
-import com.gridgain.titanic.load.TitanicLoadOnlyStore;
-import com.gridgain.titanic.util.ParseTypes;
 
 /**
  * Load data from CSV file using {@link CacheLoadOnlyStoreAdapter}.
  *
  * The adapter is intended to be used in cases when you need to pre-load a cache from text or file of any other format.
  * 
- * NOT WORKING AT PRESENT!!!
+ * NOT WORKING AT PRESENT????
  */
 public class TitanicCacheStoreLoader {
 
 	/** Cache name. */
     private static final String CACHE_NAME = "TitanicCache";
+
+	/** Load file name. */
+    private static String loadFileName = "Data/titanic.csv";
 
     /**
      * Executes example.
@@ -61,21 +51,34 @@ public class TitanicCacheStoreLoader {
      * @throws IgniteException If load execution failed.
      */
     public static void main(String[] args) throws IgniteException {
+
         System.out.println();
         System.out.println(">>> TitanicCacheStoreLoader started...");
 
-        System.out.println(">>> TitanicCacheStoreLoader create a TitanicLoadOnlyStore and initialize with file to load: " + args[0] + "...");
-    	TitanicLoadOnlyStore<TitanicKey, Titanic> los = new TitanicLoadOnlyStore();
+        for (String s: args) {
+            System.out.println(">>> TitanicCacheStoreLoader called with parms: " + s);
+        }
+        if (args.length > 0) {
+            loadFileName = args[0];
+        }
+
+        System.out.println(">>> TitanicCacheStoreLoader TitanicCacheLoadOnlyStore to be initialized with file: " + loadFileName + "...");
+
+        System.out.println(">>> TitanicCacheStoreLoader create a TitanicCacheLoadOnlyStore and initialize with file to load: " + loadFileName + "...");
+    	//TitanicCacheLoadOnlyStore<TitanicKey, Titanic> los = new TitanicCacheLoadOnlyStore(loadFileName);
+    	TitanicCacheLoadOnlyStore<TitanicKey, Titanic> los = new TitanicCacheLoadOnlyStore(); // use empty constructor, loadCache will pass parm
         los.setThreadsCount(2);
         los.setBatchSize(100);
         los.setBatchQueueSize(10);
     	
         System.out.println(">>> TitanicCacheStoreLoader start Ignite client and do...");
         try (Ignite ignite = Ignition.start("Titanic-client.xml")) {
+        //try (Ignite ignite = Ignition.start()) {
 
             // if we are able to create the cache, then load it
             System.out.println(">>> TitanicCacheStoreLoader get or create cache...");
-            try (IgniteCache<TitanicKey, Titanic> cache = ignite.getOrCreateCache(cacheConfiguration(los))) {
+            //try (IgniteCache<TitanicKey, Titanic> cache = ignite.getOrCreateCache(cacheConfiguration(los))) {
+            try (IgniteCache<TitanicKey, Titanic> cache = ignite.getOrCreateCache(CACHE_NAME)) {
 
             	// have Cache's CacheStore load the data...
                 System.out.println(">>> TitanicCacheStoreLoader; with cache, load using CacheStore...");
@@ -94,22 +97,22 @@ public class TitanicCacheStoreLoader {
         }
     }
 
-    /**
-     * Creates cache configurations for the loader.
-     *
-     * @return {@link CacheConfiguration}.
-     */
-    private static CacheConfiguration cacheConfiguration(TitanicLoadOnlyStore skopyFeatureLoadOnlyStore) {
-        System.out.println(">>> TitanicCacheStoreLoader; creating CacheConfiguration with TitanicLoadOnlyStore...");
-        CacheConfiguration cacheCfg = new CacheConfiguration();
+    // /**
+    //  * Creates cache configurations for the loader.
+    //  *
+    //  * @return {@link CacheConfiguration}.
+    //  */
+    // private static CacheConfiguration cacheConfiguration(TitanicCacheLoadOnlyStore loadOnlyStore) {
+    //     System.out.println(">>> TitanicCacheStoreLoader; creating CacheConfiguration with TitanicCacheLoadOnlyStore...");
+    //     CacheConfiguration cacheCfg = new CacheConfiguration();
 
-        cacheCfg.setCacheMode(CacheMode.PARTITIONED);
-        cacheCfg.setName(CACHE_NAME);
+    //     cacheCfg.setCacheMode(CacheMode.PARTITIONED);
+    //     cacheCfg.setName(CACHE_NAME);
 
-        // provide the loader.
-        cacheCfg.setCacheStoreFactory(new FactoryBuilder.SingletonFactory(skopyFeatureLoadOnlyStore));
+    //     // provide the loader.
+    //     cacheCfg.setCacheStoreFactory(new FactoryBuilder.SingletonFactory(loadOnlyStore));
 
-        return cacheCfg;
-    }
+    //     return cacheCfg;
+    // }
 
 }

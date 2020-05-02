@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
 public class ParseTypes {
-    public static Double ParseDouble(String strNumber) {
+    public static Double parseDouble(String strNumber) {
         Double retVal = null;
         if (strNumber != null && strNumber.length() > 0) {
             try {
@@ -21,7 +21,7 @@ public class ParseTypes {
         }
         else return retVal;
     }
-    public static Float ParseFloat(String strNumber) {
+    public static Float parseFloat(String strNumber) {
         Float retVal = null;
         if (strNumber != null && strNumber.length() > 0) {
             try {
@@ -32,7 +32,7 @@ public class ParseTypes {
         }
         else return retVal;
     }
-    public static BigDecimal ParseBigDecimal(String strNumber) {
+    public static BigDecimal parseBigDecimal(String strNumber) {
     	BigDecimal retVal = null;
         if (strNumber != null && strNumber.length() > 0) {
             try {
@@ -44,7 +44,7 @@ public class ParseTypes {
         }
         else return retVal;
     }
-    public static Integer ParseInteger(String strNumber) {
+    public static Integer parseInteger(String strNumber) {
         Integer retVal = null;
         if (strNumber != null && strNumber.length() > 0) {
             try {
@@ -55,7 +55,7 @@ public class ParseTypes {
         }
         else return retVal;
     }
-    public static Short ParseShort(String strNumber) {
+    public static Short parseShort(String strNumber) {
         Short retVal = null;
         if (strNumber != null && strNumber.length() > 0) {
             try {
@@ -66,7 +66,7 @@ public class ParseTypes {
         }
         else return retVal;
     }
-    public static Date ParseDate(String strDate) {
+    public static Date parseDate(String strDate) {
     	Date retVal = null;
         if (strDate != null && strDate.length() > 0) {
             try {
@@ -79,7 +79,7 @@ public class ParseTypes {
         }
         else return retVal;
     }
-    public static Timestamp ParseTimestamp(String strDate) {
+    public static Timestamp parseTimestamp(String strDate) {
     	Timestamp retVal = null;
         if (strDate != null && strDate.length() > 0) {
             try {
@@ -92,7 +92,7 @@ public class ParseTypes {
         }
         else return retVal;
     }
-    static Date ParseTimestampToDate(String strDate) {
+    static Date parseTimestampToDate(String strDate) {
     	Date retVal = null;
         if (strDate != null && strDate.length() > 0) {
             try {
